@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:shmart/helper/loadingAnimation.dart';
 
+// ignore: must_be_immutable
 class BarcodeSticker extends StatefulWidget {
   var db, p;
   BarcodeSticker({super.key, this.db, this.p});

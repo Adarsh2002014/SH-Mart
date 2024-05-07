@@ -3,6 +3,7 @@ import "package:flutter/material.dart";
 import 'package:share_plus/share_plus.dart';
 import "package:shmart/helper/loadingAnimation.dart";
 
+// ignore: must_be_immutable
 class OilPage extends StatefulWidget {
   var db, p;
 

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shmart/helper/loadingAnimation.dart';
 
+// ignore: must_be_immutable
 class ExpiryPage extends StatefulWidget {
   var dbobj, p;
   ExpiryPage({super.key, required this.dbobj, required this.p});
@@ -119,7 +120,7 @@ class _ExpiryPageState extends State<ExpiryPage> {
 
   addItem(){
     showDialog(context: context, builder: (context){
-      bool testBool = true;
+      // bool testBool = true;
       return AlertDialog(
         title: const Text("Add Expiry Item"),
         content: SingleChildScrollView(

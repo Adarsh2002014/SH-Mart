@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shmart/helper/loadingAnimation.dart';
 
+// ignore: must_be_immutable
 class ExpiryItemPage extends StatefulWidget {
   var dbobj, brandName;
 

@@ -1,7 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shmart/helper/loadingAnimation.dart';
 
+// ignore: must_be_immutable
 class GoalTracker extends StatefulWidget {
   var dbobj;
   GoalTracker({super.key,required this.dbobj});
@@ -181,7 +181,7 @@ class _GoalTrackerState extends State<GoalTracker> {
                   if(nameController.text.isEmpty){
                     return;
                   }
-                  final docRef = await db.collection('goalTracker').add({"title":nameController.text, "visible":true});
+                  await db.collection('goalTracker').add({"title":nameController.text, "visible":true});
                   nameController.clear();
                   setState(() {});
                   Navigator.pop(context);

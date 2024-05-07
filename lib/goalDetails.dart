@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shmart/helper/loadingAnimation.dart';
 
+// ignore: must_be_immutable
 class GoalDetails extends StatefulWidget {
   var dbobj;
 
