@@ -1,6 +1,7 @@
 import "package:cloud_firestore/cloud_firestore.dart";
 import "package:flutter/material.dart";
-import 'package:share/share.dart';
+import 'package:share_plus/share_plus.dart';
+import "package:shmart/helper/loadingAnimation.dart";
 
 class OilPage extends StatefulWidget {
   var db, p;
@@ -45,12 +46,14 @@ class _OilPageState extends State<OilPage> {
   }
 
   shareData(){
+    print("Share Data function is been called");
     var data = "";
-    obj.forEach((key, value) {
-      if(value["current"] != "0"){
-        data += "$key : ${value["current"]}Nos\n\n";
-      }
-    });
+    data += getSubShareString("Cotton");
+    data += getSubShareString("Sunflower");
+    data += getSubShareString("Groundnut");
+    data += getSubShareString("Corn");
+    data += getSubShareString("Rice");
+    print(data);
     Share.share(data);
   }
 
@@ -163,7 +166,7 @@ class _OilPageState extends State<OilPage> {
               );
             } else {
               return const Center(
-                child: CircularProgressIndicator(),
+                child: LoadingAnimation(),
               );
             }
           }),
@@ -310,5 +313,18 @@ class _OilPageState extends State<OilPage> {
       obj[itemKey]["new"] = (--count).toString();
       setState(() {});
     }
+  }
+
+  getSubShareString(brand){
+    var data = "";
+    obj.forEach((key, value) {
+      if (key.contains(brand) && value["current"] != "0") {
+        data += "$key : ${value["current"]}Nos\n\n";
+      }
+    });
+    if(data != ""){
+      data = "$brand\n----------------\n$data";
+    }
+    return data;
   }
 }

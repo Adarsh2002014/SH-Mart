@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+// import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
 
@@ -51,6 +53,7 @@ class _SearchPageState extends State<SearchPage> {
                 fontFamily: "Dashiki"),
           ),
           backgroundColor: const Color(0xffff7a40),
+          iconTheme: const IconThemeData(color: Colors.white),
           actions: [
             IconButton(
               icon: const Icon(Icons.account_tree_sharp, color: Colors.white),
@@ -93,9 +96,8 @@ class _SearchPageState extends State<SearchPage> {
                 ),
               ),
               Container(
-                padding: EdgeInsets.only(top: 8),
+                padding: const EdgeInsets.only(top: 8),
                 width: double.infinity,
-                height: 60,
                 child: ElevatedButton.icon(
                   onPressed: () {
                     searchItem();
@@ -108,6 +110,8 @@ class _SearchPageState extends State<SearchPage> {
                     TextStyle(fontFamily: "Dashiki", color: Colors.white),
                   ),
                   style: ButtonStyle(
+                    padding: MaterialStateProperty.all<EdgeInsets>(
+                        const EdgeInsets.all(12)),
                     backgroundColor:
                     MaterialStateProperty.all<Color>(Color(0xffff7a40)),
                     textStyle: MaterialStateProperty.all<TextStyle>(
@@ -120,42 +124,60 @@ class _SearchPageState extends State<SearchPage> {
                 padding: const EdgeInsets.only(top: 8),
                 width: double.infinity,
                 height: 60,
-                child: ElevatedButton.icon(
-                  onPressed: () async {
-                    try {
-                      await Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => AiBarcodeScanner(
-                            canPop: false,
-                            controller: MobileScannerController(
-                                detectionSpeed: DetectionSpeed.noDuplicates),
-                            onScan: (String value) {
-                            //   print(value);
-                              if (context.mounted) {
-                                Navigator.of(context).pop();
-                                setState(() {});
-                              }
-                              barcode = value;
-                              barcodeValue.text = barcode;
-                            },
-                          ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          try {
+                            // await Navigator.of(context).push(
+                            //   MaterialPageRoute(
+                            //     builder: (context) => AiBarcodeScanner(
+                            //       canPop: false,
+                            //       controller: MobileScannerController(
+                            //           detectionSpeed: DetectionSpeed.noDuplicates),
+                            //       onScan: (String value) {
+                            //       //   print(value);
+                            //         if (context.mounted) {
+                            //           Navigator.of(context).pop();
+                            //           setState(() {});
+                            //         }
+                            //         barcode = value;
+                            //         barcodeValue.text = barcode;
+                            //       },
+                            //     ),
+                            //   ),
+                            // );
+                            barcodeValue.text = await FlutterBarcodeScanner.scanBarcode(
+                                "#ff6666",
+                                "Return",
+                                false,
+                                ScanMode.BARCODE);
+                            if(barcodeValue.text.isNotEmpty){
+                              searchItem();
+                            }
+                            searchItem() ;
+                          } catch (e) {
+                            print(e);
+                          }
+                        },
+                        label: const Text("Barcode",
+                            style: TextStyle(
+                                fontFamily: "Dashiki", color: Colors.white)),
+                        icon: const Icon(FontAwesomeIcons.barcode, color: Colors.white),
+                        style: ButtonStyle(
+                          padding: MaterialStateProperty.all<EdgeInsets>(
+                              const EdgeInsets.all(12)),
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              const Color(0xffff7a40)),
+                          textStyle: MaterialStateProperty.all<TextStyle>(
+                              const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.w700)),
                         ),
-                      );
-                    } catch (e) {
-                      print(e);
-                    }
-                  },
-                  label: const Text("Open Barcode Scanner",
-                      style: TextStyle(
-                          fontFamily: "Dashiki", color: Colors.white)),
-                  icon: const Icon(Icons.qr_code_scanner, color: Colors.white),
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(
-                        const Color(0xffff7a40)),
-                    textStyle: MaterialStateProperty.all<TextStyle>(
-                        const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w700)),
-                  ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                  ],
                 ),
               ),
               futureBuilder()

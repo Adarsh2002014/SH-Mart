@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:share/share.dart';
+import 'package:share_plus/share_plus.dart';
 
 class MilkOrder extends StatelessWidget {
   MilkOrder({super.key});
@@ -40,10 +40,10 @@ class MilkOrder extends StatelessWidget {
             children: [
               textfield("Milk 500ml", milk500),
               textfield("Milk 1ltr", milk1000),
-              textfield("Buttermilk (Chass)", buttermilk),
-              textfield("Dahi 10RS", dahi10),
-              textfield("Dahi 22RS", dahi22),
-              textfield("Dahi 400gm", dahi400),
+              textfield("Buttermilk (Chass) 330ml", buttermilk),
+              textfield("Dahi 85ml", dahi10),
+              textfield("Dahi 200ml", dahi22),
+              textfield("Dahi 400ml", dahi400),
               textfield("Dahi 1ltr", dahi1000),
               Container(
                 padding: const EdgeInsets.only(top: 8),
@@ -97,31 +97,32 @@ class MilkOrder extends StatelessWidget {
   shareValue(context){
     String message = "";
     if(milk500.text != ""){
-      message = "Milk 500ml: ${milk500.text}\n";
+      message = "Milk 500ml: ${double.parse(milk500.text) * 24}\n";
       print("Milk: ${milk500.text}");
+
     }
     if(milk1000.text != ""){
-      message += "Milk 1ltr: ${milk1000.text}\n";
+      message += "Milk 1ltr: ${double.parse(milk1000.text) * 12}\n";
       print("Milk: ${milk1000.text}");
     }
     if(buttermilk.text != ""){
-      message += "Buttermilk(Chaas) 330ml: ${buttermilk.text}\n";
-      print("Buttermilk: ${buttermilk.text}");
+      message += "Buttermilk(Chaas) 330ml: ${double.parse(buttermilk.text) * 30}\n";
+      print("Buttermilk: ${buttermilk.text }");
     }
     if(dahi10.text != ""){
-      message += "Dahi 10Rs: ${dahi10.text}\n";
+      message += "Dahi 85ml: ${double.parse(dahi10.text) * 48}\n";
       print("Dahi 10RS: ${dahi10.text}");
     }
     if(dahi22.text != ""){
-      message += "Dahi 22Rs: ${dahi22.text}\n";
+      message += "Dahi 200ml: ${double.parse(dahi22.text) * 24}\n";
       print("Dahi 22RS: ${dahi22.text}");
     }
     if(dahi400.text != ""){
-      message += "Dahi 34Rs: ${dahi400.text}\n";
+      message += "Dahi 400ml: ${double.parse(dahi400.text) * 30}\n";
       print("Dahi 400gm: ${dahi400.text}");
     }
     if(dahi1000.text != ""){
-      message += "Dahi 72Rs: ${dahi1000.text}\n";
+      message += "Dahi 1ltr: ${double.parse(dahi1000.text) * 12}\n";
       print("Dahi 1ltr: ${dahi1000.text}");
     }
     if(message == ""){

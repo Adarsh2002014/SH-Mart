@@ -12,6 +12,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'package:shmart/barcodeSticker.dart';
 
+import 'generateOrder.dart';
+import 'goalDetails.dart';
+import 'goalTracker.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -22,6 +26,7 @@ Future<void> main() async {
   runApp(MainApp(pref: prefs, dbobj: db));
 }
 
+// ignore: must_be_immutable
 class MainApp extends StatefulWidget {
   var pref, dbobj;
 
@@ -36,11 +41,18 @@ class _MainAppState extends State<MainApp> {
   Widget build(BuildContext context) {
     var p = widget.pref;
     var dbobj = widget.dbobj;
+    var loggedIn;
+    try{
+      loggedIn = p.getString('valid');
+    } catch (e) {
+      loggedIn = "false";
+    }
+
     return MaterialApp(
       title: 'ShMart',
-      theme: ThemeData(fontFamily: 'Dashiki'),
+      theme: ThemeData(fontFamily: 'Dashiki', primaryColor: Colors.white),
       darkTheme: ThemeData.dark(),
-      home: Login(p: p, dbobj: dbobj),
+      home:loggedIn == "true"? Menu(p:p) : Login(p: p, dbobj: dbobj),
       debugShowCheckedModeBanner: false,
       // initialRoute: "/menu",
       routes: {
@@ -52,6 +64,9 @@ class _MainAppState extends State<MainApp> {
         "/oilPage": (context) => OilPage(db: dbobj, p: p),
         "/milkOrder": (context) => MilkOrder(),
         "/expiryPage": (context) => ExpiryPage(dbobj: dbobj, p: p),
+        "/generateOrder": (context) => GenerateOrder(p: p),
+        "/goalTracker": (context) => GoalTracker(dbobj: dbobj),
+        "/goalDetails": (context) => GoalDetails(dbobj: dbobj),
       },
     );
   }

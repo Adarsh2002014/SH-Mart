@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:shmart/expiryItemsPage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shmart/helper/loadingAnimation.dart';
 
 class ExpiryPage extends StatefulWidget {
   var dbobj, p;
@@ -51,12 +52,7 @@ class _ExpiryPageState extends State<ExpiryPage> {
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: const Color(0xffff7a40),
         actions: [
-          IconButton(
-              onPressed: () {
-                addItem();
-              },
-              icon: const Icon(Icons.add_rounded)
-          )
+          addItemIcon()
         ],
       ),
       body: FutureBuilder(
@@ -116,7 +112,7 @@ class _ExpiryPageState extends State<ExpiryPage> {
                 child: Text("Error Occured"),
               );
             }
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: LoadingAnimation());
           })
     );
   }
@@ -261,6 +257,33 @@ class _ExpiryPageState extends State<ExpiryPage> {
         ],
       );
     });
+  }
+
+  addItemIcon(){
+    return FutureBuilder(
+        future: storeItemsData(),
+        builder: (context, snapshot){
+          if(snapshot.connectionState == ConnectionState.waiting){
+            return const Padding(
+              padding: EdgeInsets.only(right: 10.0),
+              child: SizedBox(width:20,height:20,child: CircularProgressIndicator(color: Colors.white,strokeWidth: 4)),
+            );
+          }
+          if(snapshot.hasError) {
+            return const Padding(
+              padding: EdgeInsets.only(right: 10.0),
+              child: Icon(Icons.error_outline_rounded),
+            );
+          }
+            return IconButton(
+                onPressed: () {
+                  addItem();
+                },
+                icon: const Icon(Icons.add_rounded)
+            );
+
+        }
+    );
   }
 
   storeItemsData() async {

@@ -21,10 +21,14 @@ class _LoginState extends State<Login> {
     super.initState();
     db = widget.dbobj;
     p = widget.p;
-    if(p.getString('username')!=null){
-      username.text = p.getString('username');
-      password.text = p.getString('password');
+    try{
+      if(p.getString('username')!=null){
+        username.text = p.getString('username');
+        password.text = p.getString('password');
+      }
+    }catch(e){
     }
+
   }
 
   @override
@@ -48,10 +52,10 @@ class _LoginState extends State<Login> {
     return Container(
       margin: const EdgeInsets.only(top: 320),
       height: MediaQuery.of(context).size.height,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         // color: Color(0xffFFF1D7),
-        color: Colors.black,
-        borderRadius: BorderRadius.only(
+        color: Theme.of(context).primaryColor,
+        borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(50), topRight: Radius.circular(50)),
       ),
       // height: 900,
@@ -240,6 +244,7 @@ class _LoginState extends State<Login> {
           }else{
             p.setString('username', username.text);
             p.setString('password', password.text);
+            p.setString('valid', "true");
             // Navigator.pushNamedAndRemoveUntil(context, "/menu", (route) => false).then((_) => FadeInUp(child: Menu()).show(context));
             Navigator.of(context).pushAndRemoveUntil(PageRouteBuilder(
               pageBuilder: (context, animation, secondaryAnimation) => Menu(p: p),

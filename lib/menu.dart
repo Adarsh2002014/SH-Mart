@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shmart/login.dart';
 
 class Menu extends StatefulWidget {
   var p;
@@ -34,6 +35,15 @@ class _MenuState extends State<Menu> {
         ),
         backgroundColor: const Color(0xffff7a40),
         iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          IconButton(onPressed: (){
+            p.setString('username', "");
+            p.setString('password', "");
+            p.setString('user', "");
+            p.setString('valid',"");
+            Navigator.pushNamedAndRemoveUntil(context, "/login", (route) => false);
+          }, icon: const Icon(Icons.logout_rounded))
+        ],
       ),
       body: Container(
         child: Padding(
@@ -102,6 +112,10 @@ class _MenuState extends State<Menu> {
             "Milk Order"),
         buttons(context, '/expiryPage', Icons.date_range_rounded,
             "Expired Items"),
+        buttons(context, '/generateOrder', Icons.list_alt_rounded,
+            "Order List"),
+        buttons(context, '/goalTracker', Icons.track_changes_rounded,
+            "Tracker"),
       ];
     }else{
       return [
@@ -112,6 +126,8 @@ class _MenuState extends State<Menu> {
             'Req. Barcode'),
         buttons(context, '/oilPage', Icons.oil_barrel_rounded,
             "Oil Order List"),
+        buttons(context, '/generateOrder', Icons.list_alt_rounded,
+            "Order List"),
       ];
     }
   }

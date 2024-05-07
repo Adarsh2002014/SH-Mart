@@ -30,10 +30,7 @@ class DefaultFirebaseOptions {
           'you can reconfigure this by running the FlutterFire CLI again.',
         );
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -71,4 +68,14 @@ class DefaultFirebaseOptions {
     storageBucket: 'shmart-15083.appspot.com',
     iosBundleId: 'com.example.shmart',
   );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyCuLqGbP09jHh25OtMHrwv2jerP-P5UFvU',
+    appId: '1:1097358141827:web:f8283754213bf0da62eeb6',
+    messagingSenderId: '1097358141827',
+    projectId: 'shmart-15083',
+    authDomain: 'shmart-15083.firebaseapp.com',
+    storageBucket: 'shmart-15083.appspot.com',
+  );
+
 }

@@ -48,6 +48,7 @@ class _OrderItemsState extends State<OrderItems> {
                 fontFamily: "Dashiki"),
           ),
           backgroundColor: const Color(0xffff7a40),
+          iconTheme: IconThemeData(color: Colors.white),
           actions: [
             IconButton(
                 icon: const Icon(Icons.lock_rounded, color: Colors.white),
@@ -146,18 +147,27 @@ class _OrderItemsState extends State<OrderItems> {
                 }),
             IconButton(
                 icon: const Icon(Icons.add_rounded, color: Colors.white),
-                onPressed: () {
+                onPressed: () async {
                   print(p.getString("login"));
+                  var key = await p.getString("login");
+                  if(key == null){
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text("Please set login key first!!!"),
+                    ));
+                    return;
+                  }
                   db
                       .collection("validationKey")
-                      .where("key", isEqualTo: p.getString("login"))
+                      .where("key", isEqualTo: key)
                       .get()
                       .then((value) {
                     if (value.docs.length == 0) {
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text("Needed to login with latest Password"),
+                        content: Text("Invalid login key!!! Update Passwored"),
                       ));
                       return;
+                    }else{
+                      print("Key is correct");
                     }
                     showDialog(
                         context: context,
@@ -237,13 +247,13 @@ class _OrderItemsState extends State<OrderItems> {
                             ),
                             subtitle: Text(
                               documents[index]["orderQuantity"],
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontFamily: "Dashiki",
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600),
                             ),
                             trailing: IconButton(
-                              icon: Icon(Icons.delete),
+                              icon: const Icon(Icons.delete),
                               onPressed: () async {
                                 showDialog(
                                     context: context,
@@ -266,7 +276,7 @@ class _OrderItemsState extends State<OrderItems> {
                                                   .then((value) {
                                                 if (value.docs.length == 0) {
                                                   ScaffoldMessenger.of(context)
-                                                      .showSnackBar(SnackBar(
+                                                      .showSnackBar(const SnackBar(
                                                     content: Text(
                                                         "Needed to login with latest Password"),
                                                   ));
@@ -306,11 +316,11 @@ class _OrderItemsState extends State<OrderItems> {
                 // return Container();
               }
               if (snapshot.hasError) {
-                return Center(
+                return const Center(
                   child: Text("Error Occured"),
                 );
               }
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             }));
   }
 
