@@ -23,18 +23,18 @@ class _LoadingAnimationState extends State<LoadingAnimation> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Container(
-          height: 80,
-          width: 80,
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-              image: DecorationImage(
-                image: AssetImage(getUrl()),
-                fit: BoxFit.cover,
-              ),
-              borderRadius: BorderRadius.circular(50)
-          ),
-        ),
+        // Container(
+        //   height: 80,
+        //   width: 80,
+        //   decoration: BoxDecoration(
+        //     color: Colors.transparent,
+        //       image: DecorationImage(
+        //         image: AssetImage(getUrl()),
+        //         fit: BoxFit.cover,
+        //       ),
+        //       borderRadius: BorderRadius.circular(50)
+        //   ),
+        // ),
         Text("Loading$dots", style: const TextStyle(fontSize: 20, fontFamily: "Dashiki")),
       ],
     );

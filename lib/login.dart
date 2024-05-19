@@ -247,7 +247,7 @@ class _LoginState extends State<Login> {
             p.setString('valid', "true");
             // Navigator.pushNamedAndRemoveUntil(context, "/menu", (route) => false).then((_) => FadeInUp(child: Menu()).show(context));
             Navigator.of(context).pushAndRemoveUntil(PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) => Menu(p: p),
+              pageBuilder: (context, animation, secondaryAnimation) => Menu(p: p, dbobj: db,),
               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                 const begin = Offset(0.0, 2.0);
                 const end = Offset.zero;

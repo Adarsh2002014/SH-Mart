@@ -1,7 +1,7 @@
+// ignore_for_file: file_names
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-// import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:dio/dio.dart';
 
@@ -16,12 +16,14 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
+  // ignore: prefer_typing_uninitialized_variables
   var prefs;
-  late Map<String, dynamic> response;
-  FocusNode fn1 = new FocusNode();
-  FocusNode fn2 = new FocusNode();
   String barcode = "";
   String ipAddress = "";
+  FocusNode fn1 = FocusNode();
+  FocusNode fn2 = FocusNode();
+  late Map<String, dynamic> response;
+  TextEditingController ipValue = TextEditingController();
   TextEditingController itemValue = TextEditingController();
   TextEditingController barcodeValue = TextEditingController();
 
@@ -33,6 +35,9 @@ class _SearchPageState extends State<SearchPage> {
       return;
     }
     ipAddress = prefs.getString('ip') ?? "";
+    if (ipAddress.isNotEmpty) {
+      ipValue.text = ipAddress;
+    }
   }
 
   @override
@@ -76,7 +81,7 @@ class _SearchPageState extends State<SearchPage> {
                         onPressed: () {
                           barcodeValue.clear();
                         },
-                        icon: Icon(Icons.clear))),
+                        icon: const Icon(Icons.clear))),
                 controller: barcodeValue,
               ),
               Padding(
@@ -90,7 +95,7 @@ class _SearchPageState extends State<SearchPage> {
                         onPressed: () {
                           itemValue.clear();
                         },
-                        icon: Icon(Icons.clear)),
+                        icon: const Icon(Icons.clear)),
                   ),
                   controller: itemValue,
                 ),
@@ -113,7 +118,7 @@ class _SearchPageState extends State<SearchPage> {
                     padding: MaterialStateProperty.all<EdgeInsets>(
                         const EdgeInsets.all(12)),
                     backgroundColor:
-                    MaterialStateProperty.all<Color>(Color(0xffff7a40)),
+                    MaterialStateProperty.all<Color>(const Color(0xffff7a40)),
                     textStyle: MaterialStateProperty.all<TextStyle>(
                         const TextStyle(
                             fontSize: 20, fontWeight: FontWeight.w700)),
@@ -155,6 +160,7 @@ class _SearchPageState extends State<SearchPage> {
                                 ScanMode.BARCODE);
                             if(barcodeValue.text.isNotEmpty){
                               searchItem();
+                              setState((){});
                             }
                             searchItem() ;
                           } catch (e) {
@@ -216,7 +222,6 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   showIPModal() {
-    TextEditingController ipValue = TextEditingController();
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -243,7 +248,7 @@ class _SearchPageState extends State<SearchPage> {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text("Cancel"))
+                  child: const Text("Cancel"))
             ],
           );
         });

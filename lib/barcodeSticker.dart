@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +14,10 @@ class BarcodeSticker extends StatefulWidget {
   State<BarcodeSticker> createState() => _BarcodeStickerState();
 }
 
-class _BarcodeStickerState extends State<BarcodeSticker> with SingleTickerProviderStateMixin{
-  var db, autoCompleteList, selectedName, url, prefs, itemList = {};
+class _BarcodeStickerState extends State<BarcodeSticker>
+    with SingleTickerProviderStateMixin {
+  var db, autoCompleteList, selectedName, url, prefs;
+  Map<String, dynamic>itemList = {};
   final dio = Dio();
   TextEditingController itemValue = TextEditingController();
   @override
@@ -27,10 +30,15 @@ class _BarcodeStickerState extends State<BarcodeSticker> with SingleTickerProvid
   callApi() async {
     var ipAddress = await prefs.getString("ip");
     url =
-    "http://$ipAddress:9898/api/item/list?filter_barcode_value=&filter_name=&start_index=1&record_count=5000&get_total_count=1&accountee_identifier=8866268666&accountee_id=1";
+        "http://$ipAddress:9898/api/item/list?filter_barcode_value=&filter_name=&start_index=1&record_count=5000&get_total_count=1&accountee_identifier=8866268666&accountee_id=1";
     print(url);
     var data;
-    try{data = await dio.get(url,options: Options(receiveTimeout: const Duration(seconds: 30)));}catch(e){data = "Error";}
+    try {
+      data = await dio.get(url,
+          options: Options(receiveTimeout: const Duration(seconds: 30)));
+    } catch (e) {
+      data = "Error";
+    }
     return data;
   }
 
@@ -54,14 +62,13 @@ class _BarcodeStickerState extends State<BarcodeSticker> with SingleTickerProvid
           ),
           backgroundColor: const Color(0xffff7a40),
           iconTheme: IconThemeData(color: Colors.white),
-          actions: const [
-          ]),
+          actions: const []),
       body: Container(
         child: FutureBuilder(
             future: callApi(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                if(snapshot.data == "Error"){
+                if (snapshot.data == "Error") {
                   return const Center(
                     child: Text("Error Fetching Data, Revisit the page"),
                   );
@@ -80,7 +87,8 @@ class _BarcodeStickerState extends State<BarcodeSticker> with SingleTickerProvid
                 data = {};
                 return Column(children: [
                   Padding(
-                    padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0, bottom: 8.0),
+                    padding: const EdgeInsets.only(
+                        top: 16.0, left: 16.0, right: 16.0, bottom: 8.0),
                     child: Autocomplete<String>(
                       optionsBuilder: (TextEditingValue textEditingValue) {
                         if (textEditingValue.text == '') {
@@ -114,7 +122,8 @@ class _BarcodeStickerState extends State<BarcodeSticker> with SingleTickerProvid
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0,horizontal: 16.0),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 8.0, horizontal: 16.0),
                     child: TextField(
                       controller: itemValue,
                       keyboardType: const TextInputType.numberWithOptions(),
@@ -131,7 +140,8 @@ class _BarcodeStickerState extends State<BarcodeSticker> with SingleTickerProvid
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 8.0, horizontal: 16.0),
                     width: double.infinity,
                     height: 60,
                     child: ElevatedButton(
@@ -154,9 +164,7 @@ class _BarcodeStickerState extends State<BarcodeSticker> with SingleTickerProvid
                   returnBody()
                 ]);
               } else {
-                return const Center(
-                  child: LoadingAnimation()
-                );
+                return const Center(child: LoadingAnimation());
               }
             }),
       ),
@@ -166,12 +174,16 @@ class _BarcodeStickerState extends State<BarcodeSticker> with SingleTickerProvid
   Widget returnBody() {
     // print(itemList);
     return FutureBuilder(
-        future: db.collection("barCodes").doc("pendingBarcode").get(),
+        future: db
+            .collection("barCodes")
+            .doc("pendingBarcode")
+            .get(),
         builder: (context, snapshot) {
           DocumentSnapshot documentSnapshot =
-          snapshot.data as DocumentSnapshot<Map<dynamic, dynamic>>;
+              snapshot.data as DocumentSnapshot<Map<dynamic, dynamic>>;
           print(documentSnapshot.data());
-          itemList = documentSnapshot.data() as Map<dynamic, dynamic>;
+          itemList = documentSnapshot.data() as Map<String, dynamic>;
+          itemList = sortMapByKeys(itemList);
           if (itemList.isNotEmpty) {
             return Expanded(
               child: Container(
@@ -186,48 +198,82 @@ class _BarcodeStickerState extends State<BarcodeSticker> with SingleTickerProvid
                         padding: const EdgeInsets.only(bottom: 10.0),
                         child: Column(
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8),
-                              child: Text(
-                                "${itemList.keys.elementAt(index)}",
-                                style: const TextStyle(
-                                    fontSize: 23,
-                                    fontFamily: 'Dashiki',
-                                    fontWeight: FontWeight.w900,
-                                    color: Colors.white),
-                              ),
-                            ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 25.0, right: 25.0),
-                                  child: Text(
-                                    "Amt:- ${itemList.values.elementAt(index)[1]}",
-                                    style: const TextStyle(
-                                        fontSize: 24,
-                                        fontFamily: 'Dashiki',
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.white),
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 8),
+                                    child: Center(
+                                      child: Text(
+                                        itemList.keys.elementAt(index),
+                                        style: const TextStyle(
+                                            fontSize: 23,
+                                            fontFamily: 'Dashiki',
+                                            fontWeight: FontWeight.w900,
+                                            color: Colors.white),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                                CircleAvatar(
-                                  radius: 24,
-                                  backgroundColor: Colors.white,
-                                  child: IconButton(
-                                    icon: const Icon(
-                                      Icons.delete_rounded,
-                                      color: Color(0xffff7a40),
-                                      size: 26,
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 10.0),
+                                  child: CircleAvatar(
+                                    radius: 24,
+                                    backgroundColor: Colors.white,
+                                    child: IconButton(
+                                      icon: const Icon(
+                                        Icons.delete_rounded,
+                                        color: Color(0xffff7a40),
+                                        size: 26,
+                                      ),
+                                      onPressed: () {
+                                        removeItemValue(index);
+                                      },
                                     ),
-                                    onPressed: () {
-                                      removeItemValue(index);
-                                    },
                                   ),
+                                ),
+                                const SizedBox(
+                                  width: 10,
                                 )
                               ],
-                            )
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 25.0, right: 25.0),
+                              child: Text(
+                                "Amt:- ${itemList.values.elementAt(index)[1]}",
+                                style: const TextStyle(
+                                    fontSize: 24,
+                                    fontFamily: 'Dashiki',
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 25.0, right: 25.0),
+                              child: Text(
+                                "Price:- ${itemList.values.elementAt(index)[2]}",
+                                style: const TextStyle(
+                                    fontSize: 24,
+                                    fontFamily: 'Dashiki',
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 25.0, right: 25.0),
+                              child: Text(
+                                "Mrp:- ${itemList.values.elementAt(index)[3]}",
+                                style: const TextStyle(
+                                    fontSize: 24,
+                                    fontFamily: 'Dashiki',
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -266,8 +312,8 @@ class _BarcodeStickerState extends State<BarcodeSticker> with SingleTickerProvid
       } else {
         Map<Object, Object?> data = itemList as Map<Object, Object?>;
         var barcodeValue, salePrice, mrp;
-        for(int i=0;i<autoCompleteList.length;i++){
-          if(autoCompleteList[i]["name"] == selectedName){
+        for (int i = 0; i < autoCompleteList.length; i++) {
+          if (autoCompleteList[i]["name"] == selectedName) {
             barcodeValue = autoCompleteList[i]["barcode_value"];
             salePrice = autoCompleteList[i]["price_sale"];
             mrp = autoCompleteList[i]["price_mrp"];
@@ -285,10 +331,10 @@ class _BarcodeStickerState extends State<BarcodeSticker> with SingleTickerProvid
           ));
           setState(() {});
         }).catchError((e) => {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("Error adding item"),
-          ))
-        });
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text("Error adding item"),
+                  ))
+                });
       }
     }
   }
@@ -316,5 +362,21 @@ class _BarcodeStickerState extends State<BarcodeSticker> with SingleTickerProvid
         content: Text("Error removing item"),
       ));
     }
+  }
+
+  Map<String, dynamic> sortMapByKeys(Map<String, dynamic> map) {
+    // Convert the map to a list of key-value pairs
+    List<MapEntry<String, dynamic>> entries = map.entries.toList();
+
+    // Sort the list based on keys (ascending order)
+    entries.sort((a, b) => a.key.compareTo(b.key));
+
+    // Create a new map from the sorted list
+    Map<String, dynamic> sortedMap = {};
+    for (var entry in entries) {
+      sortedMap[entry.key] = entry.value;
+    }
+
+    return sortedMap;
   }
 }
