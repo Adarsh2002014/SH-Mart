@@ -6,9 +6,7 @@ import 'package:shmart/helper/loadingAnimation.dart';
 // ignore: must_be_immutable
 class GoalDetails extends StatefulWidget {
   var dbobj;
-
   GoalDetails({super.key, this.dbobj});
-
   @override
   State<GoalDetails> createState() => _GoalDetailsState();
 }

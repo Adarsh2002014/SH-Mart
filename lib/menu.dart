@@ -108,6 +108,7 @@ class _MenuState extends State<Menu> {
                         "Necessary Tasks:",
                         style: TextStyle(
                           color: Colors.white,
+                          fontFamily: 'Dashiki',
                           fontSize: 24,
                         ),
                       ),
@@ -120,9 +121,9 @@ class _MenuState extends State<Menu> {
                         itemCount: loopCount,
                         itemBuilder: (context, index) {
                           return ListTile(
-                            title: Text(documents[index]['orderItem'],style: TextStyle(color: Colors.white),),
-                            subtitle: Text(documents[index]['orderQuantity'],style: TextStyle(color: Colors.white54),),
-                            tileColor: Color.fromARGB(255, 255, 139, 90),
+                            title: Text(documents[index]['orderItem'],style: const TextStyle(color: Colors.white, fontFamily: 'Dashiki'),),
+                            subtitle: Text(documents[index]['orderQuantity'],style: const TextStyle(color: Colors.white54, fontFamily: 'Dashiki'),),
+                            tileColor: const Color.fromARGB(255, 255, 139, 90),
                           );
                         }),
                   )
@@ -188,6 +189,8 @@ class _MenuState extends State<Menu> {
             context, '/generateOrder', Icons.list_alt_rounded, "Order List"),
         buttons(
             context, '/goalTracker', Icons.track_changes_rounded, "Tracker"),
+        buttons(
+            context, '/rackLabelPage', Icons.label_sharp, "Rack Label"),
       ];
     } else {
       return [

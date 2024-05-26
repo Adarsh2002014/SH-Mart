@@ -1,68 +1,50 @@
-import 'dart:collection';
 import 'dart:convert';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:shmart/helper/loadingAnimation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'helper/loadingAnimation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-// ignore: must_be_immutable
-class BarcodeSticker extends StatefulWidget {
-  var db, p;
-  BarcodeSticker({super.key, this.db, this.p});
+class RackLabel extends StatefulWidget {
+  final p, dbobj;
+  const RackLabel({super.key,required this.p, this.dbobj});
 
   @override
-  State<BarcodeSticker> createState() => _BarcodeStickerState();
+  State<RackLabel> createState() => _RackLabelState();
 }
 
-class _BarcodeStickerState extends State<BarcodeSticker>
-    with SingleTickerProviderStateMixin {
+class _RackLabelState extends State<RackLabel> {
   var db, autoCompleteList, selectedName, url, prefs;
   Map<String, dynamic>itemList = {};
   final dio = Dio();
-  TextEditingController itemValue = TextEditingController();
+  TextEditingController itemName = TextEditingController();
   @override
   void initState() {
     prefs = widget.p;
     super.initState();
-    db = widget.db;
-  }
-
-  callApi() async {
-    var ipAddress = await prefs.getString("ip");
-    url =
-        "http://$ipAddress:9898/api/item/list?filter_barcode_value=&filter_name=&start_index=1&record_count=5000&get_total_count=1&accountee_identifier=8866268666&accountee_id=1";
-    print(url);
-    var data;
-    try {
-      data = await dio.get(url,
-          options: Options(receiveTimeout: const Duration(seconds: 30)));
-    } catch (e) {
-      data = "Error";
-    }
-    return data;
+    db = widget.dbobj;
   }
 
   @override
   Widget build(BuildContext context) {
-    print(Theme.of(context).brightness);
     return Scaffold(
       appBar: AppBar(
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(30),
-            ),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(30),
           ),
-          title: const Text(
-            'ShMart',
-            style: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 26,
-                color: Colors.white,
-                fontFamily: "Dashiki"),
-          ),
-          backgroundColor: const Color(0xffff7a40),
-          iconTheme: const IconThemeData(color: Colors.white),
-          actions: const []),
+        ),
+        title: const Text(
+          'Rack Label',
+          style: TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 26,
+              color: Colors.white,
+              fontFamily: "Dashiki"),
+        ),
+        backgroundColor: const Color(0xffff7a40),
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
       body: Container(
         child: FutureBuilder(
             future: callApi(),
@@ -105,8 +87,9 @@ class _BarcodeStickerState extends State<BarcodeSticker>
                       },
                       fieldViewBuilder:
                           (context, controller, focusNode, onEditingComplete) {
+                        itemName = controller;
                         return TextField(
-                          controller: controller,
+                          controller: itemName,
                           focusNode: focusNode,
                           onEditingComplete: onEditingComplete,
                           decoration: InputDecoration(
@@ -114,29 +97,11 @@ class _BarcodeStickerState extends State<BarcodeSticker>
                               labelText: 'Item Name',
                               suffixIcon: IconButton(
                                   onPressed: () {
-                                    controller.clear();
+                                    itemName.clear();
                                   },
                                   icon: const Icon(Icons.clear))),
                         );
                       },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 8.0, horizontal: 16.0),
-                    child: TextField(
-                      controller: itemValue,
-                      keyboardType: const TextInputType.numberWithOptions(),
-                      decoration: InputDecoration(
-                        border: const OutlineInputBorder(),
-                        labelText: 'No of Stickers',
-                        suffixIcon: IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            itemValue.clear();
-                          },
-                        ),
-                      ),
                     ),
                   ),
                   Container(
@@ -153,7 +118,29 @@ class _BarcodeStickerState extends State<BarcodeSticker>
                               const Color(0xffff7a40)),
                         ),
                         child: const Text(
-                          "Add Barcode",
+                          "Add Label",
+                          style: TextStyle(
+                              fontFamily: 'Dashiki',
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                              fontSize: 20),
+                        )),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 8.0, horizontal: 16.0),
+                    width: double.infinity,
+                    height: 60,
+                    child: ElevatedButton(
+                        onPressed: () {
+                          openScanner();
+                        },
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              const Color(0xffff7a40)),
+                        ),
+                        child: const Text(
+                          "Open Scanner",
                           style: TextStyle(
                               fontFamily: 'Dashiki',
                               fontWeight: FontWeight.w600,
@@ -171,19 +158,33 @@ class _BarcodeStickerState extends State<BarcodeSticker>
     );
   }
 
+  callApi() async {
+    var ipAddress = await prefs.getString("ip");
+    url =
+    "http://$ipAddress:9898/api/item/list?filter_barcode_value=&filter_name=&start_index=1&record_count=5000&get_total_count=1&accountee_identifier=8866268666&accountee_id=1";
+    print(url);
+    var data;
+    try {
+      data = await dio.get(url,
+          options: Options(receiveTimeout: const Duration(seconds: 30)));
+    } catch (e) {
+      data = "Error";
+    }
+    return data;
+  }
+
   Widget returnBody() {
     // print(itemList);
     return FutureBuilder(
         future: db
             .collection("barCodes")
-            .doc("pendingBarcode")
+            .doc("racklabel")
             .get(),
         builder: (context, snapshot) {
           DocumentSnapshot documentSnapshot =
-              snapshot.data as DocumentSnapshot<Map<dynamic, dynamic>>;
+          snapshot.data as DocumentSnapshot<Map<dynamic, dynamic>>;
           print(documentSnapshot.data());
           itemList = documentSnapshot.data() as Map<String, dynamic>;
-          print("$itemList itemList");
           itemList = sortMapByKeys(itemList);
           if (itemList.isNotEmpty) {
             return Expanded(
@@ -243,7 +244,7 @@ class _BarcodeStickerState extends State<BarcodeSticker>
                               padding: const EdgeInsets.only(
                                   left: 25.0, right: 25.0),
                               child: Text(
-                                "Amt:- ${itemList.values.elementAt(index)[1]}",
+                                "Price:- ${itemList.values.elementAt(index)[1]}",
                                 style: const TextStyle(
                                     fontSize: 24,
                                     fontFamily: 'Dashiki',
@@ -255,19 +256,7 @@ class _BarcodeStickerState extends State<BarcodeSticker>
                               padding: const EdgeInsets.only(
                                   left: 25.0, right: 25.0),
                               child: Text(
-                                "Price:- ${itemList.values.elementAt(index)[2]}",
-                                style: const TextStyle(
-                                    fontSize: 24,
-                                    fontFamily: 'Dashiki',
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 25.0, right: 25.0),
-                              child: Text(
-                                "Mrp:- ${itemList.values.elementAt(index)[3]}",
+                                "Mrp:- ${itemList.values.elementAt(index)[2]}",
                                 style: const TextStyle(
                                     fontSize: 24,
                                     fontFamily: 'Dashiki',
@@ -292,6 +281,7 @@ class _BarcodeStickerState extends State<BarcodeSticker>
   }
 
   uploadData() {
+    print("Upload Data is been called");
     if (selectedName == "") {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text("Please select an item"),
@@ -321,21 +311,23 @@ class _BarcodeStickerState extends State<BarcodeSticker>
             break;
           }
         }
-        data[selectedName] = [barcodeValue, itemValue.text, salePrice, mrp];
+        data["$selectedName"] = [barcodeValue, salePrice, mrp];
+        print(data);
         db
             .collection('barCodes')
-            .doc("pendingBarcode")
+            .doc("racklabel")
             .set(data)
             .then((value) {
+              itemName.clear();
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text("Item added successfully"),
           ));
           setState(() {});
         }).catchError((e) => {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text("Error adding item"),
-                  ))
-                });
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Error adding item"),
+          ))
+        });
       }
     }
   }
@@ -348,7 +340,7 @@ class _BarcodeStickerState extends State<BarcodeSticker>
     try {
       await db
           .collection("barCodes")
-          .doc("pendingBarcode")
+          .doc("racklabel")
           .set(itemList)
           .then((value) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -363,6 +355,47 @@ class _BarcodeStickerState extends State<BarcodeSticker>
         content: Text("Error removing item"),
       ));
     }
+  }
+
+  openScanner() async {
+    var barCode = await FlutterBarcodeScanner.scanBarcode(
+        "#ff6666",
+        "Return",
+        false,
+    ScanMode.BARCODE);
+    Map<Object, Object?> data = itemList as Map<Object, Object?>;
+    var name, salePrice, mrp;
+    for (int i = 0; i < autoCompleteList.length; i++) {
+      if (autoCompleteList[i]["barcode_value"] == barCode) {
+        name = autoCompleteList[i]["name"];
+        salePrice = autoCompleteList[i]["price_sale"];
+        mrp = autoCompleteList[i]["price_mrp"];
+        break;
+      }
+    }
+    if(name == null){
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Item not found"),
+      ));
+      return;
+    }
+    data[name] = [barCode, salePrice, mrp];
+    print(data);
+    db
+        .collection('barCodes')
+        .doc("racklabel")
+        .set(data)
+        .then((value) {
+      itemName.clear();
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Item added successfully"),
+      ));
+      setState(() {});
+    }).catchError((e) => {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Error adding item"),
+      ))
+    });
   }
 
   Map<String, dynamic> sortMapByKeys(Map<String, dynamic> map) {

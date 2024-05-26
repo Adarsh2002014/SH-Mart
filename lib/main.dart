@@ -9,6 +9,7 @@ import 'package:shmart/milkOrder.dart';
 import 'package:shmart/expiryPage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shmart/rackLabel.dart';
 import 'firebase_options.dart';
 import 'package:shmart/barcodeSticker.dart';
 
@@ -67,6 +68,7 @@ class _MainAppState extends State<MainApp> {
         "/generateOrder": (context) => GenerateOrder(p: p),
         "/goalTracker": (context) => GoalTracker(dbobj: dbobj),
         "/goalDetails": (context) => GoalDetails(dbobj: dbobj),
+        "/rackLabelPage": (context) => RackLabel(p:p, dbobj: dbobj),
       },
     );
   }
