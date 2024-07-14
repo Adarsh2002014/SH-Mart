@@ -1,6 +1,9 @@
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:shmart/helper/NewUpdate.dart';
 
 class Menu extends StatefulWidget {
   final p, dbobj;
@@ -12,6 +15,9 @@ class Menu extends StatefulWidget {
 
 class _MenuState extends State<Menu> {
   var p, user, db;
+  bool showUpdate = false;
+  NewUpdate updateApk = NewUpdate();
+  late Stream<double> updateValues;
 
   @override
   void initState() {
@@ -50,7 +56,38 @@ class _MenuState extends State<Menu> {
                 Navigator.pushNamedAndRemoveUntil(
                     context, "/login", (route) => false);
               },
-              icon: const Icon(Icons.logout_rounded))
+              icon: const Icon(Icons.logout_rounded)),
+          _checkUpdate(),
+          showUpdate
+              ? StreamBuilder(
+                  stream: updateValues,
+                  builder: (context, value) {
+                    print(value.hasData ? value.data : 0.0);
+                    if (value.hasData) {
+                      if (value.data == 1.0) {
+                        validateToUpdate();
+                        return Container();
+                      }
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: SizedBox(
+                          width: 15,
+                          height: 15,
+                          child: CircularProgressIndicator(
+                            value: value.hasData ? value.data as double : 0.0,
+                            color: Colors.white,
+                          ),
+                        ),
+                      );
+                    }else{
+                      if(value.hasError){
+                        //show snack bar the error
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(value.error.toString())));
+                      }
+                      return Container();
+                    }
+                  })
+              : Container(),
         ],
       ),
       body: SingleChildScrollView(
@@ -59,7 +96,6 @@ class _MenuState extends State<Menu> {
           children: [
             tasksCard(),
             Container(
-              padding: const EdgeInsets.only(top: 5),
               child: GridView.count(
                   primary: false,
                   physics: const NeverScrollableScrollPhysics(),
@@ -78,9 +114,9 @@ class _MenuState extends State<Menu> {
 
   tasksCard() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.only(left: 16, right: 16, top: 20, bottom: 5),
       child: Card(
-        color: Color.fromARGB(255, 252, 111, 51),
+        color: const Color.fromARGB(255, 252, 111, 51),
         child: FutureBuilder(
             future: db.collection("itemNames").get(),
             builder: (context, snapshot) {
@@ -103,7 +139,7 @@ class _MenuState extends State<Menu> {
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: Padding(
-                      padding: EdgeInsets.only(left: 16.0),
+                      padding: EdgeInsets.only(left: 16.0, top: 5),
                       child: Text(
                         "Necessary Tasks:",
                         style: TextStyle(
@@ -115,15 +151,32 @@ class _MenuState extends State<Menu> {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 16),
                     child: ListView.builder(
-                      shrinkWrap: true,
+                        shrinkWrap: true,
                         itemCount: loopCount,
                         itemBuilder: (context, index) {
-                          return ListTile(
-                            title: Text(documents[index]['orderItem'],style: const TextStyle(color: Colors.white, fontFamily: 'Dashiki'),),
-                            subtitle: Text(documents[index]['orderQuantity'],style: const TextStyle(color: Colors.white54, fontFamily: 'Dashiki'),),
-                            tileColor: const Color.fromARGB(255, 255, 139, 90),
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 5.0),
+                            child: ListTile(
+                                title: Text(
+                                  documents[index]['orderItem'],
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: 'Dashiki'),
+                                ),
+                                subtitle: Text(
+                                  documents[index]['orderQuantity'],
+                                  style: const TextStyle(
+                                      color: Colors.white54,
+                                      fontFamily: 'Dashiki'),
+                                ),
+                                tileColor:
+                                    const Color.fromARGB(255, 255, 139, 90),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                )),
                           );
                         }),
                   )
@@ -139,7 +192,7 @@ class _MenuState extends State<Menu> {
     return InkWell(
       borderRadius: const BorderRadius.all(Radius.circular(10.0)),
       onTap: () {
-        Navigator.pushNamed(context, page);
+        Navigator.pushNamed(context, page).then((value) => setState(() {}));
       },
       child: Container(
         decoration: BoxDecoration(
@@ -190,7 +243,9 @@ class _MenuState extends State<Menu> {
         buttons(
             context, '/goalTracker', Icons.track_changes_rounded, "Tracker"),
         buttons(
-            context, '/rackLabelPage', Icons.label_sharp, "Rack Label"),
+            context, '/rackLabelPage', Icons.video_label_rounded, "Rack Label"),
+        buttons(context, '/receivables', Icons.currency_rupee_rounded,
+            "Receivables"),
       ];
     } else {
       return [
@@ -209,5 +264,67 @@ class _MenuState extends State<Menu> {
   getUserName() async {
     user = await widget.p.getString('username');
     setState(() {});
+  }
+
+  _checkUpdate() {
+    return IconButton(
+        onPressed: () async {
+          bool isThereUpdate = await NewUpdate().checkIsThereUpdate();
+          if (isThereUpdate) {
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text("System Update"),
+                    content: const Text(
+                        "There is new update available!! You want to update"),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text("Cancel"),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          PermissionStatus permission =
+                              await Permission.storage.request();
+                          if (await permission.isGranted) {
+                            Directory expectedDirectory = await getApplicationDocumentsDirectory();
+                            String path = "${expectedDirectory.path}/a.apk";
+                            File file = File(path);
+                            if (await file.existsSync()) {
+                              file.deleteSync();
+                            }
+                            print("After the file delete");
+                            await updateApk.setDownloadPath();
+                            updateValues = updateApk.downloadUpdateApk();
+                            showUpdate = true;
+                            Navigator.pop(context);
+                            setState(() {});
+                          }
+                        },
+                        child: const Text("Ok"),
+                      ),
+                    ],
+                  );
+                });
+          } else {
+            showDialog(context: context, builder: (context){
+              return AlertDialog(
+                title: const Text('System Update'),
+                content: const Text('Current system is up to date!!'),
+                actions: [
+                  TextButton(onPressed: (){Navigator.pop(context);},child: const Text('Ok'),),
+                ],
+              );
+            });
+          }
+        },
+        icon: const Icon(Icons.upload));
+  }
+  
+  void validateToUpdate() {
+    updateApk.installApk();
   }
 }

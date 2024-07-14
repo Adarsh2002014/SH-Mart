@@ -74,7 +74,7 @@ class _GenerateOrderState extends State<GenerateOrder> {
     }
     var ipAddress = await prefs.getString("ip");
     var url =
-        "http://$ipAddress:9898/api/item/list?filter_barcode_value=&filter_name=&start_index=1&record_count=5000&get_total_count=1&accountee_identifier=8866268666&accountee_id=1";
+        "http://$ipAddress:9898/api/item/list?filter_barcode_value=&filter_name=&start_index=1&record_count=7000&get_total_count=1&accountee_identifier=8866268666&accountee_id=1";
     var response = await dio.get(url);
     var jsonData = jsonDecode(response.data);
     var data = jsonData['records'];

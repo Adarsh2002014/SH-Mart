@@ -10,6 +10,7 @@ import 'package:shmart/expiryPage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shmart/rackLabel.dart';
+import 'package:shmart/receivables.dart';
 import 'firebase_options.dart';
 import 'package:shmart/barcodeSticker.dart';
 
@@ -69,6 +70,7 @@ class _MainAppState extends State<MainApp> {
         "/goalTracker": (context) => GoalTracker(dbobj: dbobj),
         "/goalDetails": (context) => GoalDetails(dbobj: dbobj),
         "/rackLabelPage": (context) => RackLabel(p:p, dbobj: dbobj),
+        "/receivables": (context) => Receivables(dbobj: dbobj),
       },
     );
   }

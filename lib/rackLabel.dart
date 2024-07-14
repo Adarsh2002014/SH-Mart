@@ -44,6 +44,7 @@ class _RackLabelState extends State<RackLabel> {
         ),
         backgroundColor: const Color(0xffff7a40),
         iconTheme: const IconThemeData(color: Colors.white),
+        actions:[IconButton(onPressed: _deleteAllItem, icon: const Icon(Icons.delete_sweep_rounded))]
       ),
       body: Container(
         child: FutureBuilder(
@@ -161,7 +162,7 @@ class _RackLabelState extends State<RackLabel> {
   callApi() async {
     var ipAddress = await prefs.getString("ip");
     url =
-    "http://$ipAddress:9898/api/item/list?filter_barcode_value=&filter_name=&start_index=1&record_count=5000&get_total_count=1&accountee_identifier=8866268666&accountee_id=1";
+    "http://$ipAddress:9898/api/item/list?filter_barcode_value=&filter_name=&start_index=1&record_count=7000&get_total_count=1&accountee_identifier=8866268666&accountee_id=1";
     print(url);
     var data;
     try {
@@ -412,5 +413,46 @@ class _RackLabelState extends State<RackLabel> {
     }
 
     return sortedMap;
+  }
+
+  _deleteAllItem() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Delete All Items"),
+          content: const Text("Are you sure you want to delete all items?"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Map<String, dynamic> data = {};
+                db
+                    .collection("barCodes")
+                    .doc("racklabel")
+                    .set(data)
+                    .then((value) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text("All items deleted successfully"),
+                  ));
+                  setState(() {});
+                }).catchError((e) => {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text("Error deleting items"),
+                  ))
+                });
+                Navigator.of(context).pop();
+              },
+              child: const Text("Yes"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("No"),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

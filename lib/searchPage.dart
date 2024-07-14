@@ -200,7 +200,7 @@ class _SearchPageState extends State<SearchPage> {
     if (ipAddress != "") {
       if (itemValue.text != "" || barcodeValue.text != "") {
         url =
-        "http://$ipAddress:9898/api/item/list?filter_barcode_value=${barcodeValue.text}&filter_name=${itemValue.text}&start_index=1&record_count=5000&get_total_count=1&accountee_identifier=8866268666&accountee_id=1";
+        "http://$ipAddress:9898/api/item/list?filter_barcode_value=${barcodeValue.text}&filter_name=${itemValue.text}&start_index=1&record_count=7000&get_total_count=1&accountee_identifier=8866268666&accountee_id=1";
         // print(url);
         var resp = await dio.get(url);
         response = jsonDecode(resp.toString());

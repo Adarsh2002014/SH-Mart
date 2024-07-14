@@ -1,8 +1,8 @@
-import 'dart:collection';
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:shmart/helper/loadingAnimation.dart';
 
 // ignore: must_be_immutable
@@ -19,6 +19,7 @@ class _BarcodeStickerState extends State<BarcodeSticker>
   var db, autoCompleteList, selectedName, url, prefs;
   Map<String, dynamic>itemList = {};
   final dio = Dio();
+  TextEditingController itemName = TextEditingController();
   TextEditingController itemValue = TextEditingController();
   @override
   void initState() {
@@ -30,7 +31,7 @@ class _BarcodeStickerState extends State<BarcodeSticker>
   callApi() async {
     var ipAddress = await prefs.getString("ip");
     url =
-        "http://$ipAddress:9898/api/item/list?filter_barcode_value=&filter_name=&start_index=1&record_count=5000&get_total_count=1&accountee_identifier=8866268666&accountee_id=1";
+        "http://$ipAddress:9898/api/item/list?filter_barcode_value=&filter_name=&start_index=1&record_count=7000&get_total_count=1&accountee_identifier=8866268666&accountee_id=1";
     print(url);
     var data;
     try {
@@ -62,7 +63,9 @@ class _BarcodeStickerState extends State<BarcodeSticker>
           ),
           backgroundColor: const Color(0xffff7a40),
           iconTheme: const IconThemeData(color: Colors.white),
-          actions: const []),
+          actions: [
+            IconButton(onPressed: _deleteAllItem, icon: const Icon(Icons.delete_sweep_rounded))
+          ]),
       body: Container(
         child: FutureBuilder(
             future: callApi(),
@@ -105,8 +108,9 @@ class _BarcodeStickerState extends State<BarcodeSticker>
                       },
                       fieldViewBuilder:
                           (context, controller, focusNode, onEditingComplete) {
+                        itemName = controller;
                         return TextField(
-                          controller: controller,
+                          controller: itemName,
                           focusNode: focusNode,
                           onEditingComplete: onEditingComplete,
                           decoration: InputDecoration(
@@ -114,7 +118,7 @@ class _BarcodeStickerState extends State<BarcodeSticker>
                               labelText: 'Item Name',
                               suffixIcon: IconButton(
                                   onPressed: () {
-                                    controller.clear();
+                                    itemName.clear();
                                   },
                                   icon: const Icon(Icons.clear))),
                         );
@@ -154,6 +158,28 @@ class _BarcodeStickerState extends State<BarcodeSticker>
                         ),
                         child: const Text(
                           "Add Barcode",
+                          style: TextStyle(
+                              fontFamily: 'Dashiki',
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                              fontSize: 20),
+                        )),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 8.0, horizontal: 16.0),
+                    width: double.infinity,
+                    height: 60,
+                    child: ElevatedButton(
+                        onPressed: () {
+                          openSanner();
+                        },
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              const Color(0xffff7a40)),
+                        ),
+                        child: const Text(
+                          "Open Scanner",
                           style: TextStyle(
                               fontFamily: 'Dashiki',
                               fontWeight: FontWeight.w600,
@@ -330,6 +356,8 @@ class _BarcodeStickerState extends State<BarcodeSticker>
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text("Item added successfully"),
           ));
+          itemName.clear();
+          itemValue.clear();
           setState(() {});
         }).catchError((e) => {
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -379,5 +407,67 @@ class _BarcodeStickerState extends State<BarcodeSticker>
     }
 
     return sortedMap;
+  }
+
+  _deleteAllItem() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Delete All Items"),
+            content: const Text("Are you sure you want to delete all items?"),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Map<String,dynamic> data = {};
+                    db
+                        .collection("barCodes")
+                        .doc("pendingBarcode")
+                        .set(data)
+                        .then((value) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: const Text("All items deleted successfully"),
+                      ));
+                      Navigator.pop(context);
+                      setState(() {});
+                    }).catchError((e) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: const Text("Error deleting items"),
+                      ));
+                    });
+                  },
+                  child: const Text("Yes")),
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text("No"))
+            ],
+          );
+        }
+    );
+  }
+
+  openSanner() async {
+    var barCode = await FlutterBarcodeScanner.scanBarcode(
+        "#ff6666",
+        "Return",
+        false,
+        ScanMode.BARCODE);
+    var doDataFound = false;
+    print(barCode);
+    for (int i = 0; i < autoCompleteList.length; i++) {
+      if (autoCompleteList[i]["barcode_value"] == barCode) {
+        itemName.text = autoCompleteList[i]["name"];
+        doDataFound = true;
+        break;
+      }
+    }
+    if(!doDataFound){
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Item not found $barCode"),
+      ));
+      return;
+    }
   }
 }
