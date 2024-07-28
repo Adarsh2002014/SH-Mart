@@ -17,10 +17,10 @@ class NewUpdate {
     bool isToUpdate = false;
     var response =await dio.get('https://node-api-vercel.onrender.com/getBuildNo');
       var latestVersionNo = response.data['build_no'];
-      print(latestVersionNo);
       var currentPackageInfo = await PackageInfo.fromPlatform();
+      print(latestVersionNo);
       print(currentPackageInfo.version);
-      if (latestVersionNo != currentPackageInfo.version) {
+      if (latestVersionNo != currentPackageInfo.version.toString()) {
         isToUpdate = true;
         print("Inside the if condition, isToUpdate: $isToUpdate");
       }

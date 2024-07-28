@@ -281,8 +281,7 @@ class _ExpiryPageState extends State<ExpiryPage> {
                   addItem();
                 },
                 icon: const Icon(Icons.add_rounded)
-            );
-
+            ); 
         }
     );
   }
