@@ -1,0 +1,33 @@
+name: shmart
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  firebase_core: ^3.5.0
+  dio: ^5.7.0
+  flutter_barcode_scanner: ^2.0.0
+  cloud_firestore: ^5.4.2
+  intl: ^0.19.0
+  share_plus: ^10.0.2
+  shared_preferences: ^2.3.2
+  animate_do: ^3.3.4
+  permission_handler: ^11.3.1
+  network_info_plus: ^6.0.1
+  font_awesome_flutter: ^10.7.0
+  install_plugin: ^2.1.0
+  package_info_plus: ^8.0.2
+  get: ^4.6.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
