@@ -23,7 +23,7 @@ class _MilkOrderState extends State<MilkOrder> {
     theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text(milkOrder),
+        title: const Text(dailyDairyOrder),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -126,7 +126,7 @@ class _MilkOrderState extends State<MilkOrder> {
                 height: 10,
               ),
               ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: _shareOrder,
                   label: const Text("Share"),
                   icon: const Icon(Icons.share_rounded))
             ],
@@ -134,5 +134,39 @@ class _MilkOrderState extends State<MilkOrder> {
         ),
       ),
     );
+  }
+
+  void _shareOrder(){
+    String message = "";
+    if(milk500mlController.text != ""){
+      message = "Milk 500ml: ${double.parse(milk500mlController.text) * 24}\n";
+    }
+    if(milk1ltrController.text != ""){
+      message += "Milk 1ltr: ${double.parse(milk1ltrController.text) * 12}\n";
+    }
+    if(buttermilk200mlController.text != ""){
+      message += "Buttermilk(Chaas) 330ml: ${double.parse(buttermilk200mlController.text) * 36}\n";
+    }
+    if(dahi85mlController.text != ""){
+      message += "Dahi 85ml: ${double.parse(dahi85mlController.text) * 48}\n";
+    }
+    if(dahi200mlController.text != ""){
+      message += "Dahi 200ml: ${double.parse(dahi200mlController.text) * 24}\n";
+    }
+    if(dahi400mlController.text != ""){
+      message += "Dahi 400ml: ${double.parse(dahi400mlController.text) * 30}\n";
+    }
+    if(dahi1ltrController.text != ""){
+      message += "Dahi 1ltr: ${double.parse(dahi1ltrController.text) * 12}\n";
+    }
+    if(message == ""){
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Please enter the quantity"),
+          )
+      );
+    }else{
+      Share.share(message);
+    }
   }
 }

@@ -1,7 +1,6 @@
 import 'package:shmart/shmart.dart';
 
 class QuickSearch extends StatefulWidget {
-
   const QuickSearch({super.key});
 
   @override
@@ -24,92 +23,42 @@ class _QuickSearchState extends State<QuickSearch> {
         centerTitle: true,
       ),
       body: Stack(children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Column(
-            children: [
-              const SizedBox(
-                height: 300,
-              ),
-              Container(
-                height: 700,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(30),
-                        topRight: Radius.circular(30)),
-                    color: theme.colorScheme.primary),
-                child: ListView.builder(
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: controller.item.length,
-                    itemBuilder: (context, index) {
-                      return Container();
-                    }),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: BoxDecoration(
-              // color: theme.colorScheme.onPrimary,
-              borderRadius: BorderRadius.circular(16)),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(
-                height: 60,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: CusTextfield(
-                  controller: nameSearchController,
-                  hintText: enterItemName,
-                  suffixIcon: IconButton(
-                      onPressed: () => nameSearchController.clear(),
-                      icon: const Icon(Icons.close_rounded)),
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: CusTextfield(
-                  controller: barcodeSearchController,
-                  hintText: enterItemBarcode,
-                  suffixIcon: IconButton(
-                      onPressed: () => barcodeSearchController.clear(),
-                      icon: const Icon(Icons.close_rounded)),
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: () {},
-                    label: const Text(search),
-                    icon: const Icon(Icons.search_rounded),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: () {},
-                    label: const Text(scan),
-                    icon: const Icon(Icons.scanner_rounded),
-                  ),
-                ],
-              ),
-            ],
-          ),
+        const QuickList(),
+        SearchForm(
+          nameSearchController: nameSearchController,
+          barcodeSearchController: barcodeSearchController,
+          onSearch: () {
+            if (nameSearchController.text.isNotEmpty ||
+                barcodeSearchController.text.isNotEmpty) {
+              controller.getItems(
+                  itemName: nameSearchController.text,
+                  barcode: barcodeSearchController.text,
+                  context: context);
+            }
+          },
+          onScan: () async {
+            try {
+              barcodeSearchController.text =
+                  await FlutterBarcodeScanner.scanBarcode(
+                      mainSeedColor.toString(), cancel, false, ScanMode.BARCODE);
+              if (barcodeSearchController.text.isNotEmpty) {
+                controller.getItems(
+                    itemName: nameSearchController.text,
+                    barcode: barcodeSearchController.text,
+                    context: context);
+              }
+            } catch (e) {
+              print(e);
+            }
+          },
         ),
       ]),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    controller.quickItem.clear();
   }
 }

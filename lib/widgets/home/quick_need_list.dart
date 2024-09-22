@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:shmart/const/_const.dart';
+import 'package:shmart/shmart.dart';
 
 class QuickNeedList extends StatefulWidget {
   const QuickNeedList({super.key});

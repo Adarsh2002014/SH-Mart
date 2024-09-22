@@ -1,0 +1,1 @@
+export 'package:shmart/widgets/quick_search/quick_list.dart';

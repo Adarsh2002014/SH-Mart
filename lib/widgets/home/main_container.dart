@@ -13,7 +13,7 @@ class _MainContainerState extends State<MainContainer> {
   @override
   Widget build(BuildContext context) {
     return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 10.0),
+      padding: EdgeInsets.symmetric(horizontal: 16.0),
       child: Row(
         children: [
           Container1(
@@ -90,11 +90,17 @@ class Container1State extends State<Container1> {
                   const SizedBox(
                     height: 10,
                   ),
-                  Text(
-                    widget.title,
-                    softWrap: true,
-                    style: theme.textTheme.bodySmall
-                        ?.copyWith(fontSize: 24, fontWeight: FontWeight.w400),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: FittedBox(
+                      fit: BoxFit.fitWidth,
+                      child: Text(
+                        widget.title,
+                        softWrap: true,
+                        style: theme.textTheme.bodySmall
+                            ?.copyWith(fontSize: 24, fontWeight: FontWeight.w400),
+                      ),
+                    ),
                   )
                 ],
               ),

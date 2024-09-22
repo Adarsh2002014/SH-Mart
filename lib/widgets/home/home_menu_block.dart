@@ -15,7 +15,7 @@ class _HomeMenuBlockState extends State<HomeMenuBlock> {
   Widget build(BuildContext context) {
     theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: InkWell(
         onTap: () {
           if(widget.menu.menuRoute != null && widget.menu.menuRoute != ""){

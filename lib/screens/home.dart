@@ -19,7 +19,7 @@ class _HomeState extends State<Home> {
         title: Text(
           applicationName,
           style: theme.textTheme.displayMedium
-              ?.copyWith(fontWeight: FontWeight.w500),
+              ?.copyWith(fontWeight: FontWeight.w400),
         ),
         centerTitle: true,
       ),
@@ -85,19 +85,19 @@ class _HomeState extends State<Home> {
         height: 12,
       ));
       columnWidgetList.add(HomeMenuBlock(
-          menu: Menu(
-              menuTitle: milkOrder,
-              menuIcon: Icons.water_drop_rounded,
-              menuRoute: milkOrderPage)));
-      columnWidgetList.add(const SizedBox(
-        height: 12,
-      ));
-      columnWidgetList.add(HomeMenuBlock(
         menu: Menu(
             menuTitle: orderList,
             menuIcon: Icons.list_alt_rounded,
             menuRoute: orderListPage),
       ));
+      columnWidgetList.add(const SizedBox(
+        height: 12,
+      ));
+      columnWidgetList.add(HomeMenuBlock(
+          menu: Menu(
+              menuTitle: dailyDairyOrder,
+              menuIcon: Icons.water_drop_rounded,
+              menuRoute: milkOrderPage)));
       columnWidgetList.add(const SizedBox(
         height: 20,
       ));
@@ -126,6 +126,15 @@ class _HomeState extends State<Home> {
         menu: Menu(
             menuTitle: receivables,
             menuIcon: Icons.currency_rupee_rounded,
+            menuRoute: receivablesPage),
+      ));
+      columnWidgetList.add(const SizedBox(
+        height: 12,
+      ));
+      columnWidgetList.add(HomeMenuBlock(
+        menu: Menu(
+            menuTitle: settings,
+            menuIcon: Icons.settings_rounded,
             menuRoute: receivablesPage),
       ));
       columnWidgetList.add(const SizedBox(

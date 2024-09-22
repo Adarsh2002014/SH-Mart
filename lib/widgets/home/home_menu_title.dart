@@ -16,7 +16,7 @@ class _HomeMenuTitleState extends State<HomeMenuTitle> {
   Widget build(BuildContext context) {
     theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16),
       child: Text(
         widget.title,
         style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
